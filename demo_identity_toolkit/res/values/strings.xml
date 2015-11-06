@@ -8,4 +8,6 @@
     <string name="manage_account_label">Manage account</string>
     <string name="sign_out_label">Sign out</string>
 
+    <string name="fb_app_id">KEY4</string>
+
 </resources>
