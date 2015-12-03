@@ -30,6 +30,7 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
+            android:id="@+id/google_etc"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/google_sign_in"
@@ -54,6 +55,14 @@
                 android:text="@string/disconnect"
                 android:theme="@style/ThemeOverlay.MyDarkButton" />
         </LinearLayout>
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/facebook_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/google_etc"
+            android:layout_margin="20dp"
+            android:gravity="center"/>
 
     </RelativeLayout>
 
