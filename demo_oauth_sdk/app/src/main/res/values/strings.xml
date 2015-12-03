@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">demo_oauth_sdk</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Button labels -->
+    <string name="sign_out">Sign Out</string>
+    <string name="disconnect">Disconnect</string>
+
+</resources>
