@@ -2,12 +2,16 @@
     <string name="app_name">demo_oauth_sdk</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Button labels -->
+    <!-- Google-->
     <string name="sign_out">Sign Out</string>
     <string name="disconnect">Disconnect</string>
 
 
     <!-- Facebook -->
     <string name="facebook_app_id">1484772718496784</string>
+
+
+    <!-- Naver -->
+    <string name="naver_get_mail">Get Naver Mail</string>
 
 </resources>

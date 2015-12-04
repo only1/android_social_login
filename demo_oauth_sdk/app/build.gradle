@@ -44,4 +44,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:8.3.0'
     // Facebook
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
+    // Naver
+    compile files('libs/naver-oauth-login-4.1.4.1-with-sources.jar')
 }

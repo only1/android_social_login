@@ -3,6 +3,8 @@ package com.only1.demo_oauth_sdk;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.nhn.android.naverlogin.OAuthLogin;
+import com.nhn.android.naverlogin.OAuthLoginHandler;
+import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
 
 import org.json.JSONObject;
 
@@ -48,6 +53,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Facebook
     private CallbackManager mCallbackManager = null;
+
+
+
+    // Naver
+    private static String NAVER_OAUTH_CLIENT_ID = "L1cYvEYxzqwbCWbjkU0u";
+    private static String NAVER_OAUTH_CLIENT_SECRET = "9D08pS_dt0";
+    private static String NAVER_OAUTH_CLIENT_NAME = "OAuthDemo";
+    private OAuthLogin mOAuthLogin = null;
 
 
     // UI Class
@@ -83,6 +96,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Facebook
         //////////////////////////////
         initFacebook();
+
+
+        //////////////////////////////
+        // Naver
+        //////////////////////////////
+        initNaver();
 
 
         //////////////////////////////
@@ -256,33 +275,126 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, "[Facebook::showCurrentLogInInformation] AccessToken : " + AccessToken.getCurrentAccessToken().toString());
             Log.d(TAG, "[Facebook::showCurrentLogInInformation] Profile(id) : " + Profile.getCurrentProfile().getId());
             Log.d(TAG, "[Facebook::showCurrentLogInInformation] Profile(Name) : " + Profile.getCurrentProfile().getName());
+
+            StringBuffer strBuffer = new StringBuffer("facebook >>> ");
+            strBuffer
+                    .append("CurrentAccessToken : " + AccessToken.getCurrentAccessToken().toString() + "\n")
+                    .append("CurrentProfile(ID) : " + Profile.getCurrentProfile().getId() + "\n")
+                    .append("CurrentProfile(Name) : " + Profile.getCurrentProfile().getName() + "\n");
+            mLogText.setText(strBuffer);
+
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
     }
 
-    private void queryInformationToFacebook(AccessToken token) {
-        new AsyncTask<AccessToken, Void, Void>() {
+
+    private class QueryTask extends AsyncTask<AccessToken, Void, Void> {
+
+        private String mResponse = null;
+        private Handler mHandler = new Handler() {
             @Override
-            protected Void doInBackground(AccessToken... params) {
-                GraphRequest request = GraphRequest.newMeRequest(params[0], new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d(TAG, "[Facebook::onCompleted] response : " + response.toString());
-                    }
-                });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id, name, email, gender, birthday");
-                request.setParameters(parameters);
-                request.executeAndWait();
-                return null;
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                StringBuffer strBuffer = new StringBuffer(mLogText.getText());
+                strBuffer.append("\nemail : " + mResponse.toString() + "\n");
+                mLogText.setText(strBuffer);
             }
-        }.execute(token);
+        };
+
+        public QueryTask() {
+
+        }
+
+        @Override
+        protected Void doInBackground(AccessToken... params) {
+            GraphRequest request = GraphRequest.newMeRequest(params[0], new GraphRequest.GraphJSONObjectCallback() {
+                @Override
+                public void onCompleted(JSONObject object, GraphResponse response) {
+                    Log.d(TAG, "[Facebook::onCompleted] response : " + response.toString());
+                    mResponse = response.toString();
+                    mHandler.sendEmptyMessage(0);
+                }
+            });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "id, name, email, gender, birthday");
+            request.setParameters(parameters);
+            request.executeAndWait();
+            return null;
+        }
+    }
+
+    private void queryInformationToFacebook(AccessToken token) {
+        new QueryTask().execute(token);
     }
 
     private void logIn() {
         //LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "user_friends"));
         LoginManager.getInstance().logInWithReadPermissions(this, null);
+    }
+
+
+    ////////////////////////////////////////////////////////
+    //
+    // private methods (Naver)
+    //
+    ////////////////////////////////////////////////////////
+    private void initNaver() {
+        mOAuthLogin = OAuthLogin.getInstance();
+        mOAuthLogin.init(getApplicationContext(), NAVER_OAUTH_CLIENT_ID, NAVER_OAUTH_CLIENT_SECRET, NAVER_OAUTH_CLIENT_NAME);
+
+        ((OAuthLoginButton)findViewById(R.id.naver_login)).setOAuthLoginHandler(new OAuthLoginHandler() {
+            @Override
+            public void run(boolean success) {
+                if (success) {
+                    Log.d(TAG, "[Naver::run] success");
+
+                    StringBuffer strBuffer = new StringBuffer("naver >>> ");
+                    strBuffer
+                            .append("accessToken : " + mOAuthLogin.getAccessToken(getApplicationContext()) + "\n")
+                            .append("refreshToken : " + mOAuthLogin.getRefreshToken(getApplicationContext()) + "\n")
+                            .append("expiresAt : " + mOAuthLogin.getExpiresAt(getApplicationContext()) + "\n")
+                            .append("tokenType : " + mOAuthLogin.getTokenType(getApplicationContext()) + "\n")
+                            .append("state : " + mOAuthLogin.getState(getApplicationContext()).toString() + "\n");
+                    mLogText.setText(strBuffer);
+
+                } else {
+                    Log.d(TAG, "[Naver::run] fail");
+
+                    StringBuffer strBuffer = new StringBuffer("naver >>> ");
+                    strBuffer
+                            .append("ErrorCode : " + mOAuthLogin.getLastErrorCode(getApplicationContext()).getCode() + "\n")
+                            .append("ErrorDesc : " + mOAuthLogin.getLastErrorDesc(getApplicationContext()) + "\n");
+                    mLogText.setText(strBuffer);
+                }
+            }
+        });
+        //((OAuthLoginButton)findViewById(R.id.naver_login)).setBgResourceId(R.drawable.img_loginbtn_usercustom);
+
+        findViewById(R.id.naver_get_email).setOnClickListener(this);
+    }
+
+    private void getNaverMail() {
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... params) {
+                String url = "https://openapi.naver.com/v1/nid/getUserProfile.xml";
+                String at = mOAuthLogin.getAccessToken(getApplicationContext());
+                return mOAuthLogin.requestApi(getApplicationContext(), at, url);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+
+                StringBuffer strBuffer = new StringBuffer(mLogText.getText());
+                strBuffer.append("\nemail : " + s + "\n");
+                mLogText.setText(strBuffer);
+
+            }
+        }.execute();
     }
 
 
@@ -303,6 +415,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.facebook_login:
                 showCurrentLogInInformation();
                 logIn();
+                break;
+            case R.id.naver_get_email:
+                getNaverMail();
                 break;
         }
     }

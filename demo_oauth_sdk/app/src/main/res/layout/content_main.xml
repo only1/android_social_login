@@ -22,6 +22,9 @@
             android:layout_height="wrap_content"
             android:text="Hello World!" />
 
+
+        <!-- Google ========================================== -->
+
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_sign_in"
             android:layout_below="@id/log_text"
@@ -56,6 +59,8 @@
                 android:theme="@style/ThemeOverlay.MyDarkButton" />
         </LinearLayout>
 
+        <!-- Facebook ========================================== -->
+
         <com.facebook.login.widget.LoginButton
             android:id="@+id/facebook_login"
             android:layout_width="match_parent"
@@ -63,6 +68,25 @@
             android:layout_below="@id/google_etc"
             android:layout_margin="20dp"
             android:gravity="center"/>
+
+
+        <!-- Naver ========================================== -->
+        <com.nhn.android.naverlogin.ui.view.OAuthLoginButton
+            android:id="@+id/naver_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/facebook_login"
+            android:layout_margin="20dp"
+            android:gravity="center"/>
+
+        <Button
+            android:id="@+id/naver_get_email"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:layout_below="@id/naver_login"
+            android:text="@string/naver_get_mail"
+            android:theme="@style/ThemeOverlay.MyDarkButton" />
 
     </RelativeLayout>
 
