@@ -279,6 +279,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             StringBuffer strBuffer = new StringBuffer("facebook >>> ");
             strBuffer
                     .append("CurrentAccessToken : " + AccessToken.getCurrentAccessToken().toString() + "\n")
+                    .append("CurrentAccessToken(UserId) : " + AccessToken.getCurrentAccessToken().getUserId() + "\n")
+                    .append("CurrentAccessToken(token) : " + AccessToken.getCurrentAccessToken().getToken() + "\n")
                     .append("CurrentProfile(ID) : " + Profile.getCurrentProfile().getId() + "\n")
                     .append("CurrentProfile(Name) : " + Profile.getCurrentProfile().getName() + "\n");
             mLogText.setText(strBuffer);
