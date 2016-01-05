@@ -6,7 +6,7 @@ android {
         testSign {
             keyAlias 'daehwang01'
             keyPassword 'daehwang01'
-            storeFile file('/Users/1002418/Development/Project/daehwang01.jks')
+            storeFile file('../../daehwang01.jks')
             storePassword 'daehwang01'
         }
     }
